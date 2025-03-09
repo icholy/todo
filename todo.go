@@ -28,6 +28,7 @@ import (
 	"github.com/smacker/go-tree-sitter/java"
 	"github.com/smacker/go-tree-sitter/javascript"
 	"github.com/smacker/go-tree-sitter/kotlin"
+	"github.com/smacker/go-tree-sitter/lua"
 	"github.com/smacker/go-tree-sitter/ocaml"
 	"github.com/smacker/go-tree-sitter/php"
 	"github.com/smacker/go-tree-sitter/protobuf"
@@ -42,7 +43,6 @@ import (
 	"github.com/smacker/go-tree-sitter/typescript/tsx"
 	"github.com/smacker/go-tree-sitter/typescript/typescript"
 	"github.com/smacker/go-tree-sitter/yaml"
-	// "github.com/smacker/go-tree-sitter/lua"
 )
 
 var languages = map[string]*sitter.Language{
@@ -84,9 +84,7 @@ var languages = map[string]*sitter.Language{
 	".toml":       toml.GetLanguage(),
 	".yaml":       yaml.GetLanguage(),
 	".yml":        yaml.GetLanguage(),
-
-	// TODO: investigate compilation error
-	// ".lua":        lua.GetLanguage(),
+	".lua":        lua.GetLanguage(),
 }
 
 // FileExtensions returns all supported file extensions
