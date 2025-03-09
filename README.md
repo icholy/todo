@@ -14,7 +14,7 @@ Each valid TODO line **must** begin with `TODO`. It may optionally include a com
 ### Basic Structure
 
 ```
-TODO(...) : description
+TODO(key1, key2=value, key3="quoted value", ...): description
 ```
 
 Without attributes, the line still requires the colon:
