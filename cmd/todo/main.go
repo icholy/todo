@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	todo "github.com/icholy/todo"
+	"github.com/icholy/todo"
 )
 
 type TodoJSON struct {
