@@ -147,6 +147,17 @@ func TestParseLine(t *testing.T) {
 			},
 		},
 		{
+			name: "attribute without value",
+			line: `TODO(key): description`,
+			ok:   true,
+			want: Todo{
+				Description: "description",
+				Attributes: []Attribute{
+					{Key: "key"},
+				},
+			},
+		},
+		{
 			name: "extra whitespace",
 			line: `   TODO (key = value, key2 =  "value" ) : description`,
 			ok:   true,
