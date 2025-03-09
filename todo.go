@@ -166,12 +166,12 @@ func Parse(ctx context.Context, file string, source []byte, lang *sitter.Languag
 // ParseLine parses a single TODO line.
 // Does not set the Location or Line fields.
 func ParseLine(line string) (Todo, bool) {
+	var t Todo
 	// ignore everything up to the first TODO
 	_, line, ok := strings.Cut(line, "TODO")
 	if !ok {
-		return Todo{}, false
+		return t, false
 	}
-	var t Todo
 	br := bufio.NewReader(strings.NewReader(line))
 	// After "TODO", optional attributes in parentheses
 	if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
@@ -209,7 +209,6 @@ func parseAttributes(br *bufio.Reader, t *Todo) error {
 	if b, err := br.ReadByte(); err != nil || b != '(' {
 		return errors.New("expected '('")
 	}
-
 	for {
 		if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 			return err
@@ -223,14 +222,12 @@ func parseAttributes(br *bufio.Reader, t *Todo) error {
 			br.ReadByte() // consume ')'
 			return nil
 		}
-
 		// parse one attribute
 		attr, err := parseOneAttribute(br)
 		if err != nil {
 			return err
 		}
 		t.Attributes = append(t.Attributes, attr)
-
 		// after attribute, maybe ',' or ')'
 		if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 			return err
@@ -253,14 +250,12 @@ func parseAttributes(br *bufio.Reader, t *Todo) error {
 //   - etc.
 func parseOneAttribute(br *bufio.Reader) (Attribute, error) {
 	attr := Attribute{}
-
 	// read the "key" portion, up to ',', ')', '=' or whitespace
 	token, err := readUntilAny(br, []rune{',', ')', '='})
 	if err != nil {
 		return attr, err
 	}
 	attr.Key = strings.TrimSpace(token)
-
 	// Now check what we hit: could be '=', ',', ')', or EOF
 	r, err := br.Peek(1)
 	if err != nil && !errors.Is(err, io.EOF) {
@@ -312,7 +307,6 @@ func parseOneAttribute(br *bufio.Reader) (Attribute, error) {
 		// Some unexpected character
 		return attr, errors.New("unexpected character in attribute list")
 	}
-
 	return attr, nil
 }
 
@@ -332,7 +326,6 @@ func parseValue(br *bufio.Reader) (string, bool, error) {
 // parseQuotedValue consumes an initial quote, reads until matching unescaped quote.
 func parseQuotedValue(br *bufio.Reader) (string, error) {
 	var sb strings.Builder
-
 	// opening quote
 	b, err := br.ReadByte()
 	if err != nil {
@@ -341,7 +334,6 @@ func parseQuotedValue(br *bufio.Reader) (string, error) {
 	if b != '"' {
 		return "", errors.New("expected opening quote")
 	}
-
 	for {
 		r, _, err := br.ReadRune()
 		if err != nil {
@@ -377,7 +369,6 @@ func parseQuotedValue(br *bufio.Reader) (string, error) {
 // readValueUnquoted reads until ',', ')' or whitespace. It doesn't consume the stopping rune.
 func readValueUnquoted(br *bufio.Reader) (string, error) {
 	var sb strings.Builder
-
 	for {
 		r, _, err := br.ReadRune()
 		if err != nil {
@@ -392,7 +383,6 @@ func readValueUnquoted(br *bufio.Reader) (string, error) {
 		}
 		sb.WriteRune(r)
 	}
-
 	return strings.TrimSpace(sb.String()), nil
 }
 
