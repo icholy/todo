@@ -438,18 +438,3 @@ func skipWhite(br *bufio.Reader) error {
 		}
 	}
 }
-
-// matchString checks if the next runes match exactly s (e.g. "TODO").
-func matchString(br *bufio.Reader, s string) (bool, error) {
-	for _, want := range s {
-		r, _, err := br.ReadRune()
-		if err != nil {
-			return false, err
-		}
-		if r != want {
-			_ = br.UnreadRune()
-			return false, nil
-		}
-	}
-	return true, nil
-}
