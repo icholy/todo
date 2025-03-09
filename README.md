@@ -1,6 +1,11 @@
 # TODO [WIP]
 
-> A tool & library for parsing structured TODO comments out of code.
+> A library for parsing structured TODO comments out of code.
+
+## Implementation
+
+* Tree-Sitter is used to parse comments out of source files.
+* TODOs are extracted from the comments using a recursive descent parser.
 
 ## Syntax
 
