@@ -1,4 +1,4 @@
-# TODO [WIP]
+# TODO
 
 > A library for parsing structured TODO comments out of code.
 
