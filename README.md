@@ -58,5 +58,11 @@ go install github.com/icholy/todo/cmd/todo@latest
 ### Usage
 
 ```
-todo **/*.go
+$ todo ./**/*.go
+{
+  "Location": "./todo.go:88",
+  "Line": "// TODO: investigate compilation error",
+  "Description": "investigate compilation error",
+  "Attributes": {}
+}
 ```
