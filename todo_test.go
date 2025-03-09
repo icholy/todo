@@ -148,12 +148,14 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			name: "attribute without value",
-			line: `TODO(key): description`,
+			line: `TODO(key, 2025-03-06, author=icholy): description`,
 			ok:   true,
 			want: Todo{
 				Description: "description",
 				Attributes: []Attribute{
 					{Key: "key"},
+					{Key: "2025-03-06"},
+					{Key: "author", Value: "icholy"},
 				},
 			},
 		},
