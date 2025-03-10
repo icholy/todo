@@ -314,7 +314,7 @@ func parseValue(br *bufio.Reader) (string, bool, error) {
 		return v, true, err
 	}
 	// parse unquoted
-	v, err := readValueUnquoted(br)
+	v, err := parseValueUnquoted(br)
 	return v, false, err
 }
 
@@ -361,8 +361,8 @@ func parseQuotedValue(br *bufio.Reader) (string, error) {
 	return sb.String(), nil
 }
 
-// readValueUnquoted reads until ',', ')' or whitespace. It doesn't consume the stopping rune.
-func readValueUnquoted(br *bufio.Reader) (string, error) {
+// parseValueUnquoted reads until ',', ')' or whitespace. It doesn't consume the stopping rune.
+func parseValueUnquoted(br *bufio.Reader) (string, error) {
 	var sb strings.Builder
 	for {
 		r, _, err := br.ReadRune()
@@ -385,7 +385,7 @@ func readValueUnquoted(br *bufio.Reader) (string, error) {
 // Used to grab an attribute key up to '=', ',', or ')'.
 func readUntilAny(br *bufio.Reader, stop []rune) (string, error) {
 	var sb strings.Builder
-stopLoop:
+loop:
 	for {
 		r, size, err := br.ReadRune()
 		if err != nil {
@@ -398,7 +398,7 @@ stopLoop:
 			if r == s {
 				// put it back
 				_ = br.UnreadRune()
-				break stopLoop
+				break loop
 			}
 		}
 		sb.WriteRune(r)
