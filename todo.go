@@ -175,7 +175,7 @@ func ParseLine(line string) (Todo, bool) {
 	if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 		return t, false
 	}
-	if peek, _ := br.Peek(1); len(peek) == 1 && peek[0] == '(' {
+	if peekByte(br) == '(' {
 		if err := parseAttributes(br, &t); err != nil {
 			return t, false
 		}
@@ -185,8 +185,7 @@ func ParseLine(line string) (Todo, bool) {
 		return t, false
 	}
 	// Check for a colon
-	p, _ := br.Peek(1)
-	if len(p) == 0 || p[0] != ':' {
+	if peekByte(br) != ':' {
 		return t, false
 	}
 	// Consume the colon
@@ -284,8 +283,7 @@ func parseOneAttribute(br *bufio.Reader) (Attribute, error) {
 			if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 				return attr, err
 			}
-			peek2, _ := br.Peek(1)
-			if len(peek2) > 0 && peek2[0] == '=' {
+			if peekByte(br) == '=' {
 				br.ReadByte() // consume '='
 				if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 					return attr, err
@@ -310,8 +308,7 @@ func parseOneAttribute(br *bufio.Reader) (Attribute, error) {
 
 // parseValue checks if next is a quoted or unquoted value
 func parseValue(br *bufio.Reader) (string, bool, error) {
-	r, _ := br.Peek(1)
-	if len(r) == 1 && r[0] == '"' {
+	if peekByte(br) == '"' {
 		// parse quoted
 		v, err := parseQuotedValue(br)
 		return v, true, err
@@ -425,4 +422,12 @@ func skipWhite(br *bufio.Reader) error {
 			return nil
 		}
 	}
+}
+
+func peekByte(br *bufio.Reader) byte {
+	b, err := br.Peek(1)
+	if err != nil {
+		return 0
+	}
+	return b[0]
 }
