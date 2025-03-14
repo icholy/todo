@@ -28,7 +28,7 @@ func main() {
 			log.Fatal(err)
 		}
 		ctx := context.Background()
-		todos, err := todo.Parse(ctx, filename, source, nil)
+		todos, err := todo.Parse(ctx, filename, source)
 		if err != nil {
 			log.Fatal(err)
 		}

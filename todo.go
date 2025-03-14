@@ -7,9 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"maps"
 	"path/filepath"
-	"slices"
 	"strings"
 	"unicode"
 
@@ -87,9 +85,10 @@ var languages = map[string]*sitter.Language{
 	".lua":        lua.GetLanguage(),
 }
 
-// FileExtensions returns all supported file extensions
-func FileExtensions() []string {
-	return slices.Sorted(maps.Keys(languages))
+// LanguageFor returns the language for the given file name
+func LanguageFor(file string) (*sitter.Language, bool) {
+	l, ok := languages[filepath.Ext(file)]
+	return l, ok
 }
 
 // Attribute represents a key=value pair
@@ -113,11 +112,19 @@ type Todo struct {
 	Attributes  []Attribute
 }
 
-// Parse parses the source code and returns all TODO comments
-func Parse(ctx context.Context, file string, source []byte, lang *sitter.Language) ([]Todo, error) {
+// Parse parses the source and returns all TODO comments.
+func Parse(ctx context.Context, file string, source []byte) ([]Todo, error) {
+	if lang, ok := LanguageFor(file); ok {
+		return ParseCode(ctx, file, source, lang)
+	}
+	return ParseText(file, string(source)), nil
+}
+
+// ParseCode parses the source code and returns all TODO comments
+func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Language) ([]Todo, error) {
 	if lang == nil {
 		var ok bool
-		lang, ok = languages[filepath.Ext(file)]
+		lang, ok = LanguageFor(file)
 		if !ok {
 			return nil, fmt.Errorf("no language for file: %s", file)
 		}
@@ -144,21 +151,32 @@ func Parse(ctx context.Context, file string, source []byte, lang *sitter.Languag
 		for _, c := range m.Captures {
 			row := c.Node.StartPoint().Row
 			comment := c.Node.Content(source)
-			for line := range strings.Lines(comment) {
-				line = strings.TrimSuffix(line, "\n")
-				if todo, ok := ParseLine(line); ok {
-					todo.Line = line
-					todo.Location = Location{
-						File: file,
-						Line: int(row + 1),
-					}
-					todos = append(todos, todo)
-				}
-				row++
+			for _, todo := range ParseText(file, comment) {
+				todo.Location.Line += int(row)
+				todos = append(todos, todo)
 			}
 		}
 	}
 	return todos, nil
+}
+
+// ParseText parses a text string and returns all TODO comments
+func ParseText(file, text string) []Todo {
+	var todos []Todo
+	var row int
+	for line := range strings.Lines(text) {
+		line = strings.TrimSuffix(line, "\n")
+		if todo, ok := ParseLine(line); ok {
+			todo.Line = line
+			todo.Location = Location{
+				File: file,
+				Line: row + 1,
+			}
+			todos = append(todos, todo)
+		}
+		row++
+	}
+	return todos
 }
 
 // ParseLine parses a single TODO line.

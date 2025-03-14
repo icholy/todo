@@ -8,7 +8,7 @@ import (
 	"github.com/smacker/go-tree-sitter/golang"
 )
 
-func TestParse(t *testing.T) {
+func TestParseCode(t *testing.T) {
 	tests := []struct {
 		name   string
 		file   string
@@ -52,7 +52,7 @@ func TestParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Parse(t.Context(), tt.file, tt.source, tt.lang)
+			got, err := ParseCode(t.Context(), tt.file, tt.source, tt.lang)
 			if err != nil {
 				t.Fatalf("Parse(%q, %q, lang) error = %v", tt.file, tt.source, err)
 			}
