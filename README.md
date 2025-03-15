@@ -2,6 +2,8 @@
 
 A library for parsing structured TODO comments out of code.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/icholy/todo.svg)](https://pkg.go.dev/github.com/icholy/todo)
+
 ## Overview
 
 - **Tree-Sitter** is used to parse comments from source files.
