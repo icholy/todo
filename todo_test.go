@@ -233,9 +233,10 @@ func TestTodoString(t *testing.T) {
 				Attributes: []Attribute{
 					{Key: "created", Value: "2025-03-09"},
 					{Key: "assigned", Value: "john"},
+					{Key: "message", Value: "hello", Quote: true},
 				},
 			},
-			want: "TODO(created=2025-03-09, assigned=john): fix this",
+			want: `TODO(created=2025-03-09, assigned=john, message="hello"): fix this`,
 		},
 	}
 	for _, tt := range tests {
