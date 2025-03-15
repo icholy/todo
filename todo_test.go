@@ -5,10 +5,9 @@ import (
 	"testing"
 
 	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/golang"
 )
 
-func TestParseCode(t *testing.T) {
+func TestParse(t *testing.T) {
 	tests := []struct {
 		name   string
 		file   string
@@ -20,7 +19,6 @@ func TestParseCode(t *testing.T) {
 			name:   "simple",
 			file:   "test.go",
 			source: []byte("// TODO: fix this\n"),
-			lang:   golang.GetLanguage(),
 			want: []Todo{
 				{
 					Line: "// TODO: fix this",
@@ -29,7 +27,6 @@ func TestParseCode(t *testing.T) {
 						Line: 1,
 					},
 					Description: "fix this",
-					Attributes:  nil,
 				},
 			},
 		},
@@ -45,14 +42,36 @@ func TestParseCode(t *testing.T) {
 						Line: 2,
 					},
 					Description: "does this work ?",
-					Attributes:  nil,
+				},
+			},
+		},
+		{
+			name:   "non treesitter",
+			file:   "some.txt",
+			source: []byte("// TODO: fix this\nTODO: fix this again"),
+			want: []Todo{
+				{
+					Line: "// TODO: fix this",
+					Location: Location{
+						File: "some.txt",
+						Line: 1,
+					},
+					Description: "fix this",
+				},
+				{
+					Line: "TODO: fix this again",
+					Location: Location{
+						File: "some.txt",
+						Line: 2,
+					},
+					Description: "fix this again",
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseCode(t.Context(), tt.file, tt.source, tt.lang)
+			got, err := Parse(t.Context(), tt.file, tt.source)
 			if err != nil {
 				t.Fatalf("Parse(%q, %q, lang) error = %v", tt.file, tt.source, err)
 			}
