@@ -48,10 +48,10 @@ func TestParse(t *testing.T) {
 		{
 			name:   "non treesitter",
 			file:   "some.txt",
-			source: []byte("// TODO: fix this\nTODO: fix this again"),
+			source: []byte("// TODO(): fix this\nTODO: fix this again"),
 			want: []Todo{
 				{
-					Line: "// TODO: fix this",
+					Line: "// TODO(): fix this",
 					Location: Location{
 						File: "some.txt",
 						Line: 1,
@@ -107,6 +107,14 @@ func TestParseLine(t *testing.T) {
 			name: "do not match TODO without colon",
 			line: "TODO fix this",
 			ok:   false,
+		},
+		{
+			name: "empty attribute list",
+			line: "TODO(): fix this",
+			ok:   true,
+			want: Todo{
+				Description: "fix this",
+			},
 		},
 		{
 			name: "with attributes",
