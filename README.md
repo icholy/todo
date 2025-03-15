@@ -1,6 +1,6 @@
 # TODO
 
-A library for parsing structured TODO comments out of code.
+A library for parsing structured TODO comments from code.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/icholy/todo.svg)](https://pkg.go.dev/github.com/icholy/todo)
 
