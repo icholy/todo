@@ -207,7 +207,7 @@ func ParseText(file string, text []byte) []Todo {
 	scanner := bufio.NewScanner(bytes.NewReader(text))
 	for scanner.Scan() {
 		line := scanner.Text()
-		if todo, ok := ParseLine(line); ok {
+		if todo, ok := parseLine(line); ok {
 			todo.Line = line
 			todo.Location = Location{
 				File: file,
@@ -220,9 +220,9 @@ func ParseText(file string, text []byte) []Todo {
 	return todos
 }
 
-// ParseLine parses a single TODO line.
+// parseLine parses a single TODO line.
 // Does not set the Location or Line fields.
-func ParseLine(line string) (Todo, bool) {
+func parseLine(line string) (Todo, bool) {
 	var t Todo
 	// ignore everything up to the first TODO
 	_, line, ok := strings.Cut(line, "TODO")
