@@ -1,67 +1,59 @@
 # TODO
 
-> A library for parsing structured TODO comments out of code.
+A library for parsing structured TODO comments out of code.
 
-## Implementation
+## Overview
 
-* Tree-Sitter is used to parse comments out of source files.
-* TODOs are extracted from the comments using a recursive descent parser.
+- **Tree-Sitter** is used to parse comments from source files.
+- A simple recursive descent parser then extracts and interprets `TODO` lines.
 
 ## Syntax
 
-Each valid TODO line **must** begin with `TODO`. It may optionally include a comma‐separated attribute list in parentheses immediately following `TODO`, but **must** always include a colon (`:`). Everything after the colon is treated as the description.
+`TODO` can appear anywhere in a comment line; anything before `TODO` is ignored. Once `TODO` is found:
 
-### Basic Structure
+1. An optional comma-separated list of attributes can follow, enclosed in parentheses.
+2. A colon (`:`) must appear next.
+3. Everything after the colon is the description.
 
-```
-TODO(key1, key2=value, key3="quoted value", ...): description
-```
-
-Without attributes, the line still requires the colon:
-
-```
-TODO: description
-```
-
-### Attributes
-
-- Attributes appear inside parentheses right after `TODO`.
-- They are separated by commas.  
-- Each attribute can be:
-
-1. **Bare Key** - (ex: `2025-03-06`)
-2. **Unquoted Key–Value**  - (ex: `key=value`)
-3. **Quoted Key–Value**  - (ex: `author="John Doe"`)
-
-Within quoted values, `\"` is interpreted as `"` and `\\` as a literal backslash `\`.
 
 ### Examples
 
 ```
 // TODO: no attributes
-// TODO(foo,bar): 2 key-only attributes
-// TODO(created=2025-03-09, assigned=john): multiple key/value attributes
+// TODO(foo,bar): two key-only attributes
+// TODO(created=2025-03-09, assigned=john): multiple key/value
 // TODO(deadline="June 2025"): quoted value 
+```
+
+### Grammar
+
+```
+todo-line  ::= (any text) "TODO" [ "(" attributes? ")" ] ":" description
+attributes ::= attribute [ "," attribute ]*
+attribute  ::= bare-key | key-value
+key-value  ::= bare-key "=" (bare-key | quoted-value)
+description ::= (any text to end of line)
+bare-key   ::= (any non-whitespace sequence without parentheses, commas, or '=')
+quoted-value ::= "\"" (any text) "\""
 ```
 
 ## CLI Tool
 
-This repository comes with a very minimal tool for testing this package.
-It parses TODO comments from source files outputs them in JSON format.
+A minimal CLI tool is provided to parse and output these comments as JSON.
 
-### Install
+### Installation
 
 ```
 go install github.com/icholy/todo/cmd/todo@latest
 ```
 
-### Usage
+### Usage Example
 
 ```
-$ todo ./**/*.go
+todo ./**/*.go
 {
   "Location": "./todo.go:88",
-  "Line": "// TODO: investigate compilation error",
+  "Line": "// extra text TODO: investigate compilation error",
   "Description": "investigate compilation error",
   "Attributes": {}
 }
