@@ -98,6 +98,17 @@ type Attribute struct {
 	Quote bool
 }
 
+// String returns a string representation
+func (a Attribute) String() string {
+	if a.Value == "" {
+		return a.Key
+	}
+	if a.Quote {
+		return fmt.Sprintf("%s=%q", a.Key, a.Value)
+	}
+	return fmt.Sprintf("%s=%s", a.Key, a.Value)
+}
+
 // Location represents a file location
 type Location struct {
 	File string
@@ -110,6 +121,25 @@ type Todo struct {
 	Location    Location
 	Description string
 	Attributes  []Attribute
+}
+
+// String returns a string representation
+func (t Todo) String() string {
+	var b strings.Builder
+	b.WriteString("TODO")
+	if len(t.Attributes) >= 0 {
+		b.WriteByte('(')
+		for i, a := range t.Attributes {
+			if i > 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(a.String())
+		}
+		b.WriteByte(')')
+	}
+	b.WriteString(": ")
+	b.WriteString(t.Description)
+	return b.String()
 }
 
 // Parse parses the source and returns all TODO comments.

@@ -194,3 +194,28 @@ func TestParseLine(t *testing.T) {
 		})
 	}
 }
+
+func TestTodoString(t *testing.T) {
+	tests := []struct {
+		todo Todo
+		want string
+	}{
+		{
+			todo: Todo{
+				Description: "fix this",
+				Attributes: []Attribute{
+					{Key: "created", Value: "2025-03-09"},
+					{Key: "assigned", Value: "john"},
+				},
+			},
+			want: "TODO(created=2025-03-09, assigned=john): fix this",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.todo.String(); got != tt.want {
+				t.Errorf("Todo.String() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
