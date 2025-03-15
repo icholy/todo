@@ -246,3 +246,44 @@ func TestTodoString(t *testing.T) {
 		})
 	}
 }
+
+func TestTodoAttribute(t *testing.T) {
+	todo := Todo{
+		Attributes: []Attribute{
+			{Key: "created", Value: "2025-03-09"},
+			{Key: "assigned", Value: "john"},
+		},
+	}
+	tests := []struct {
+		key   string
+		value string
+		ok    bool
+	}{
+		{
+			key:   "created",
+			value: "2025-03-09",
+			ok:    true,
+		},
+		{
+			key:   "assigned",
+			value: "john",
+			ok:    true,
+		},
+		{
+			key:   "unknown",
+			value: "",
+			ok:    false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.key, func(t *testing.T) {
+			got, ok := todo.Attribute(tt.key)
+			if ok != tt.ok {
+				t.Fatalf("Todo.Attribute(%q) = got ok=%v, want ok=%v", tt.key, ok, tt.ok)
+			}
+			if got != tt.value {
+				t.Errorf("Todo.Attribute(%q) = %q, want %q", tt.key, got, tt.value)
+			}
+		})
+	}
+}

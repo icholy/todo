@@ -123,6 +123,16 @@ type Todo struct {
 	Attributes  []Attribute
 }
 
+// Attribute returns the value for the given key
+func (t Todo) Attribute(key string) (string, bool) {
+	for _, a := range t.Attributes {
+		if a.Key == key {
+			return a.Value, true
+		}
+	}
+	return "", false
+}
+
 // String returns a string representation
 func (t Todo) String() string {
 	var b strings.Builder
