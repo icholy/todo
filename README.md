@@ -53,10 +53,5 @@ go install github.com/icholy/todo/cmd/todo@latest
 
 ```
 todo ./**/*.go
-{
-  "Location": "./todo.go:88",
-  "Line": "// extra text TODO: investigate compilation error",
-  "Description": "investigate compilation error",
-  "Attributes": {}
-}
+./todo.go:88 TODO: investigate compilation error
 ```
