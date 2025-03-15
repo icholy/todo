@@ -117,7 +117,7 @@ func Parse(ctx context.Context, file string, source []byte) ([]Todo, error) {
 	if lang, ok := LanguageFor(file); ok {
 		return ParseCode(ctx, file, source, lang)
 	}
-	return ParseText(file, string(source)), nil
+	return ParseText(file, source), nil
 }
 
 // ParseCode parses the source code and returns all TODO comments
@@ -150,7 +150,7 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 		m = cursor.FilterPredicates(m, source)
 		for _, c := range m.Captures {
 			row := c.Node.StartPoint().Row
-			comment := c.Node.Content(source)
+			comment := source[c.Node.StartByte():c.Node.EndByte()]
 			for _, todo := range ParseText(file, comment) {
 				todo.Location.Line += int(row)
 				todos = append(todos, todo)
@@ -161,11 +161,12 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 }
 
 // ParseText parses a text string and returns all TODO comments
-func ParseText(file, text string) []Todo {
+func ParseText(file string, text []byte) []Todo {
 	var todos []Todo
-	var row int
-	for line := range strings.Lines(text) {
-		line = strings.TrimSuffix(line, "\n")
+	row := 0
+	scanner := bufio.NewScanner(bytes.NewReader(text))
+	for scanner.Scan() {
+		line := scanner.Text()
 		if todo, ok := ParseLine(line); ok {
 			todo.Line = line
 			todo.Location = Location{
