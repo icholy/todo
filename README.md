@@ -17,7 +17,6 @@ A library for parsing structured TODO comments out of code.
 2. A colon (`:`) must appear next.
 3. Everything after the colon is the description.
 
-
 ### Examples
 
 ```
@@ -37,6 +36,37 @@ key-value  ::= bare-key "=" (bare-key | quoted-value)
 description ::= (any text to end of line)
 bare-key   ::= (any non-whitespace sequence without parentheses, commas, or '=')
 quoted-value ::= "\"" (any text) "\""
+```
+
+## API Usage
+
+``` go
+package main
+
+import (
+	"os"
+	"fmt"
+	"context"
+
+	"github.com/icholy/todo"
+)
+
+func main() {
+	// read file source
+	file := "./main.go"
+	source, _ := os.ReadFile(source)
+
+	// parse todos
+	ctx := context.Background()
+	todos, _ := todo.Parse(ctx, file, source)
+
+	// print todos with deadlines
+	for _, t := range todos {
+		if _, ok := t.Attribute("deadline"); ok {
+			fmt.Println(t)
+		}
+	}
+}
 ```
 
 ## CLI Tool
