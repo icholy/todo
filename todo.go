@@ -181,7 +181,10 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 		return nil, err
 	}
 	defer tree.Close()
-	query, err := sitter.NewQuery([]byte("(comment) @comment"), lang)
+	query, err := sitter.NewQuery([]byte(`
+		(comment) @comment
+		(#match? @comment "TODO")
+	`), lang)
 	if err != nil {
 		return nil, err
 	}
