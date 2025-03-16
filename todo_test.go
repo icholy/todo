@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"context"
 	"os"
 	"reflect"
 	"testing"
@@ -73,7 +72,7 @@ func TestParse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Parse(t.Context(), tt.file, tt.source)
+			got, err := Parse(tt.file, tt.source)
 			if err != nil {
 				t.Fatalf("Parse(%q, %q, lang) error = %v", tt.file, tt.source, err)
 			}
@@ -325,9 +324,8 @@ func BenchmarkParseCode(b *testing.B) {
 	if err != nil {
 		b.Fatalf("failed to read source: %v", err)
 	}
-	ctx := context.Background()
 	for b.Loop() {
-		todos, err := ParseCode(ctx, "testdata/sample.go", source, nil)
+		todos, err := ParseCode("testdata/sample.go", source, nil)
 		if err != nil {
 			b.Fatalf("failed to parse: %v", err)
 		}

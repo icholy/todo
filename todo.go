@@ -3,7 +3,6 @@ package todo
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -125,16 +124,16 @@ func (t Todo) String() string {
 }
 
 // Parse parses the source and returns all TODO comments.
-func Parse(ctx context.Context, file string, source []byte) ([]Todo, error) {
+func Parse(file string, source []byte) ([]Todo, error) {
 	if lang, ok := LanguageFor(file); ok {
-		return ParseCode(ctx, file, source, lang)
+		return ParseCode(file, source, lang)
 	}
 	return ParseText(file, source), nil
 }
 
 // ParseCode parses the source code and returns all TODO comments.
 // If lang is nil, the language is inferred from the file extension.
-func ParseCode(ctx context.Context, file string, source []byte, opt *LanguageOptions) ([]Todo, error) {
+func ParseCode(file string, source []byte, opt *LanguageOptions) ([]Todo, error) {
 	if opt == nil {
 		var ok bool
 		opt, ok = LanguageFor(file)

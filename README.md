@@ -46,7 +46,6 @@ package main
 import (
 	"os"
 	"fmt"
-	"context"
 
 	"github.com/icholy/todo"
 )
@@ -57,8 +56,7 @@ func main() {
 	source, _ := os.ReadFile(source)
 
 	// parse todos
-	ctx := context.Background()
-	todos, _ := todo.Parse(ctx, file, source)
+	todos, _ := todo.Parse(file, source)
 
 	// print todos with deadlines
 	for _, t := range todos {

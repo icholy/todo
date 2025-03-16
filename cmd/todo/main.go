@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -17,8 +16,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		ctx := context.Background()
-		todos, err := todo.Parse(ctx, filename, source)
+		todos, err := todo.Parse(filename, source)
 		if err != nil {
 			log.Fatal(err)
 		}
