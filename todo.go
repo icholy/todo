@@ -8,20 +8,20 @@ import (
 	"path/filepath"
 	"strings"
 
-	sitter "github.com/tree-sitter/go-tree-sitter"
+	treesitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-var languages = map[string]*sitter.Language{}
+var languages = map[string]*treesitter.Language{}
 
 // RegisterLanguage registers a language with the given extensions.
-func RegisterLanguage(lang *sitter.Language, extensions ...string) {
+func RegisterLanguage(lang *treesitter.Language, extensions ...string) {
 	for _, ext := range extensions {
 		languages[ext] = lang
 	}
 }
 
 // LanguageFor returns the language for the given file name.
-func LanguageFor(file string) (*sitter.Language, bool) {
+func LanguageFor(file string) (*treesitter.Language, bool) {
 	l, ok := languages[filepath.Ext(file)]
 	return l, ok
 }
@@ -102,7 +102,7 @@ func Parse(ctx context.Context, file string, source []byte) ([]Todo, error) {
 
 // ParseCode parses the source code and returns all TODO comments.
 // If lang is nil, the language is inferred from the file extension.
-func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Language) ([]Todo, error) {
+func ParseCode(ctx context.Context, file string, source []byte, lang *treesitter.Language) ([]Todo, error) {
 	if lang == nil {
 		var ok bool
 		lang, ok = LanguageFor(file)
@@ -111,12 +111,12 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 		}
 	}
 	var todos []Todo
-	parser := sitter.NewParser()
+	parser := treesitter.NewParser()
 	defer parser.Close()
 	parser.SetLanguage(lang)
 	tree := parser.Parse(source, nil)
 	defer tree.Close()
-	query, err := sitter.NewQuery(lang, `
+	query, err := treesitter.NewQuery(lang, `
 		(comment) @comment
 		(#match? @comment "TODO")
 	`)
@@ -124,7 +124,7 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 		return nil, err
 	}
 	defer query.Close()
-	cursor := sitter.NewQueryCursor()
+	cursor := treesitter.NewQueryCursor()
 	defer cursor.Close()
 	captures := cursor.Captures(query, tree.RootNode(), source)
 	for {
