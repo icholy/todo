@@ -11,17 +11,41 @@ import (
 	treesitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-var languages = map[string]*treesitter.Language{}
+var languages = map[string]*LanguageOptions{}
+
+// LanguageOptions are options for a language.
+type LanguageOptions struct {
+	Name       string
+	Extensions []string
+	Language   *treesitter.Language
+	Queries    []*treesitter.Query
+}
 
 // RegisterLanguage registers a language with the given extensions.
-func RegisterLanguage(lang *treesitter.Language, extensions ...string) {
-	for _, ext := range extensions {
-		languages[ext] = lang
+// If no queries are provided, the default queries will be used.
+func RegisterLanguage(opt LanguageOptions) {
+	if len(opt.Queries) == 0 {
+		names := []string{"comment", "line_comment", "block_comment"}
+		for _, name := range names {
+			query, err := treesitter.NewQuery(
+				opt.Language,
+				fmt.Sprintf(`(%s) @comment (#match? @comment "TODO")`, name),
+			)
+			if err == nil {
+				opt.Queries = append(opt.Queries, query)
+			}
+		}
+	}
+	if len(opt.Queries) == 0 {
+		panic(fmt.Sprintf("no queries for language: %s", opt.Name))
+	}
+	for _, ext := range opt.Extensions {
+		languages[ext] = &opt
 	}
 }
 
 // LanguageFor returns the language for the given file name.
-func LanguageFor(file string) (*treesitter.Language, bool) {
+func LanguageFor(file string) (*LanguageOptions, bool) {
 	l, ok := languages[filepath.Ext(file)]
 	return l, ok
 }
@@ -102,10 +126,10 @@ func Parse(ctx context.Context, file string, source []byte) ([]Todo, error) {
 
 // ParseCode parses the source code and returns all TODO comments.
 // If lang is nil, the language is inferred from the file extension.
-func ParseCode(ctx context.Context, file string, source []byte, lang *treesitter.Language) ([]Todo, error) {
-	if lang == nil {
+func ParseCode(ctx context.Context, file string, source []byte, opt *LanguageOptions) ([]Todo, error) {
+	if opt == nil {
 		var ok bool
-		lang, ok = LanguageFor(file)
+		opt, ok = LanguageFor(file)
 		if !ok {
 			return nil, fmt.Errorf("no language for file: %s", file)
 		}
@@ -113,31 +137,25 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *treesitter
 	var todos []Todo
 	parser := treesitter.NewParser()
 	defer parser.Close()
-	parser.SetLanguage(lang)
+	parser.SetLanguage(opt.Language)
 	tree := parser.Parse(source, nil)
 	defer tree.Close()
-	query, err := treesitter.NewQuery(lang, `
-		(comment) @comment
-		(#match? @comment "TODO")
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer query.Close()
 	cursor := treesitter.NewQueryCursor()
 	defer cursor.Close()
-	captures := cursor.Captures(query, tree.RootNode(), source)
-	for {
-		m, index := captures.Next()
-		if m == nil {
-			break
-		}
-		node := m.Captures[index].Node
-		row := node.StartPosition().Row
-		comment := source[node.StartByte():node.EndByte()]
-		for _, todo := range ParseText(file, comment) {
-			todo.Location.Line += int(row)
-			todos = append(todos, todo)
+	for _, query := range opt.Queries {
+		captures := cursor.Captures(query, tree.RootNode(), source)
+		for {
+			m, index := captures.Next()
+			if m == nil {
+				break
+			}
+			node := m.Captures[index].Node
+			row := node.StartPosition().Row
+			comment := source[node.StartByte():node.EndByte()]
+			for _, todo := range ParseText(file, comment) {
+				todo.Location.Line += int(row)
+				todos = append(todos, todo)
+			}
 		}
 	}
 	return todos, nil

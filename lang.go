@@ -3,7 +3,7 @@
 package todo
 
 import (
-	sitter "github.com/tree-sitter/go-tree-sitter"
+	treesitter "github.com/tree-sitter/go-tree-sitter"
 	bash "github.com/tree-sitter/tree-sitter-bash/bindings/go"
 	csharp "github.com/tree-sitter/tree-sitter-c-sharp/bindings/go"
 	c "github.com/tree-sitter/tree-sitter-c/bindings/go"
@@ -23,22 +23,94 @@ import (
 )
 
 func init() {
-	RegisterLanguage(sitter.NewLanguage(golang.Language()), ".go")
-	RegisterLanguage(sitter.NewLanguage(typescript.LanguageTypescript()), ".ts")
-	RegisterLanguage(sitter.NewLanguage(typescript.LanguageTSX()), ".tsx")
-	RegisterLanguage(sitter.NewLanguage(javascript.Language()), ".js")
-	RegisterLanguage(sitter.NewLanguage(ruby.Language()), ".rb")
-	RegisterLanguage(sitter.NewLanguage(python.Language()), ".py")
-	RegisterLanguage(sitter.NewLanguage(rust.Language()), ".rs")
-	RegisterLanguage(sitter.NewLanguage(html.Language()), ".html")
-	RegisterLanguage(sitter.NewLanguage(css.Language()), ".css")
-	RegisterLanguage(sitter.NewLanguage(bash.Language()), ".sh", ".bash")
-	RegisterLanguage(sitter.NewLanguage(c.Language()), ".c", ".h")
-	RegisterLanguage(sitter.NewLanguage(cpp.Language()), ".cpp", ".cc", ".hpp")
-	RegisterLanguage(sitter.NewLanguage(csharp.Language()), ".cs")
-	RegisterLanguage(sitter.NewLanguage(java.Language()), ".java")
-	RegisterLanguage(sitter.NewLanguage(ocaml.LanguageOCaml()), ".ml")
-	RegisterLanguage(sitter.NewLanguage(ocaml.LanguageOCamlInterface()), ".mli")
-	RegisterLanguage(sitter.NewLanguage(php.LanguagePHP()), ".php")
-	RegisterLanguage(sitter.NewLanguage(scala.Language()), ".scala", ".sc")
+	RegisterLanguage(LanguageOptions{
+		Name:       "Golang",
+		Language:   treesitter.NewLanguage(golang.Language()),
+		Extensions: []string{".go"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "TypeScript",
+		Language:   treesitter.NewLanguage(typescript.LanguageTypescript()),
+		Extensions: []string{".ts"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "TypeScript TSX",
+		Language:   treesitter.NewLanguage(typescript.LanguageTSX()),
+		Extensions: []string{".tsx"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "JavaScript",
+		Language:   treesitter.NewLanguage(javascript.Language()),
+		Extensions: []string{".js"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Ruby",
+		Language:   treesitter.NewLanguage(ruby.Language()),
+		Extensions: []string{".rb"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Rust",
+		Language:   treesitter.NewLanguage(rust.Language()),
+		Extensions: []string{".rs"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Python",
+		Language:   treesitter.NewLanguage(python.Language()),
+		Extensions: []string{".py"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "HTML",
+		Language:   treesitter.NewLanguage(html.Language()),
+		Extensions: []string{".html"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "CSS",
+		Language:   treesitter.NewLanguage(css.Language()),
+		Extensions: []string{".css"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Bash",
+		Language:   treesitter.NewLanguage(bash.Language()),
+		Extensions: []string{".sh", ".bash"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "C",
+		Language:   treesitter.NewLanguage(c.Language()),
+		Extensions: []string{".c", ".h"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "C++",
+		Language:   treesitter.NewLanguage(cpp.Language()),
+		Extensions: []string{".cpp", ".cc", ".hpp"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "C#",
+		Language:   treesitter.NewLanguage(csharp.Language()),
+		Extensions: []string{".cs"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Java",
+		Language:   treesitter.NewLanguage(java.Language()),
+		Extensions: []string{".java"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "OCaml",
+		Language:   treesitter.NewLanguage(ocaml.LanguageOCaml()),
+		Extensions: []string{".ml"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "OCaml Interface",
+		Language:   treesitter.NewLanguage(ocaml.LanguageOCamlInterface()),
+		Extensions: []string{".mli"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "PHP",
+		Language:   treesitter.NewLanguage(php.LanguagePHP()),
+		Extensions: []string{".php"},
+	})
+	RegisterLanguage(LanguageOptions{
+		Name:       "Scala",
+		Language:   treesitter.NewLanguage(scala.Language()),
+		Extensions: []string{".scala", ".sc"},
+	})
 }
