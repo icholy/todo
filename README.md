@@ -86,7 +86,7 @@ todo ./**/*.go
 
 ## Language Support
 
-The library supports the following languages out of the box:
+The following languages are supported out of the box:
 
 - Golang (.go)
 - TypeScript (.ts, .tsx)
@@ -105,7 +105,7 @@ The library supports the following languages out of the box:
 - PHP (.php)
 - Scala (.scala, .sc)
 
-You can also register custom languages:
+Additional language support can be added by calling `todo.RegisterLanguage`:
 
 ```go
 import (
