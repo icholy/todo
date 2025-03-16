@@ -1,6 +1,8 @@
 package todo
 
 import (
+	"context"
+	"os"
 	"reflect"
 	"testing"
 
@@ -315,5 +317,21 @@ func TestLocationString(t *testing.T) {
 				t.Errorf("Location.String() = %q, want %q", got, tt.want)
 			}
 		})
+	}
+}
+
+func BenchmarkParseCode(b *testing.B) {
+	source, err := os.ReadFile("testdata/sample.go")
+	if err != nil {
+		b.Fatalf("failed to read source: %v", err)
+	}
+	for b.Loop() {
+		todos, err := ParseCode(context.Background(), "testdata/sample.go", source, nil)
+		if err != nil {
+			b.Fatalf("failed to parse: %v", err)
+		}
+		if len(todos) == 0 {
+			b.Fatalf("no TODO comments found")
+		}
 	}
 }
