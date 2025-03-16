@@ -134,7 +134,7 @@ func (t Todo) Attribute(key string) (string, bool) {
 func (t Todo) String() string {
 	var b strings.Builder
 	b.WriteString("TODO")
-	if len(t.Attributes) >= 0 {
+	if len(t.Attributes) > 0 {
 		b.WriteByte('(')
 		for i, a := range t.Attributes {
 			if i > 0 {

@@ -238,6 +238,13 @@ func TestTodoString(t *testing.T) {
 			},
 			want: `TODO(created=2025-03-09, assigned=john, message="hello"): fix this`,
 		},
+		{
+			todo: Todo{
+				Description: "fix this",
+				Attributes:  nil,
+			},
+			want: "TODO: fix this",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.want, func(t *testing.T) {
