@@ -169,16 +169,20 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 	}
 	var todos []Todo
 	parser := sitter.NewParser()
+	defer parser.Close()
 	parser.SetLanguage(lang)
 	tree, err := parser.ParseCtx(ctx, nil, source)
 	if err != nil {
 		return nil, err
 	}
+	defer tree.Close()
 	query, err := sitter.NewQuery([]byte("(comment) @comment"), lang)
 	if err != nil {
 		return nil, err
 	}
+	defer query.Close()
 	cursor := sitter.NewQueryCursor()
+	defer cursor.Close()
 	cursor.Exec(query, tree.RootNode())
 	for {
 		m, ok := cursor.NextMatch()
