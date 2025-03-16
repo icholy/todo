@@ -23,7 +23,7 @@ func main() {
 			log.Fatal(err)
 		}
 		for _, t := range todos {
-			fmt.Printf("%s:%d %s\n", t.Location.File, t.Location.Line, t)
+			fmt.Printf("%s %s\n", t.Location, t)
 		}
 	}
 }

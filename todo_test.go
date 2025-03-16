@@ -295,3 +295,25 @@ func TestTodoAttribute(t *testing.T) {
 		})
 	}
 }
+
+func TestLocationString(t *testing.T) {
+	tests := []struct {
+		loc  Location
+		want string
+	}{
+		{
+			loc: Location{
+				File: "test.go",
+				Line: 10,
+			},
+			want: "test.go:10",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.loc.String(); got != tt.want {
+				t.Errorf("Location.String() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}

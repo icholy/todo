@@ -112,6 +112,11 @@ type Location struct {
 	Line int
 }
 
+// String returns a string representation of the location.
+func (l Location) String() string {
+	return fmt.Sprintf("%s:%d", l.File, l.Line)
+}
+
 // Todo represents a TODO line.
 type Todo struct {
 	Line        string
