@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"path/filepath"
@@ -172,11 +171,10 @@ func ParseCode(file string, source []byte, opt *LanguageOptions) ([]Todo, error)
 func ParseText(file string, text []byte) []Todo {
 	var todos []Todo
 	row := 0
-	scanner := bufio.NewScanner(bytes.NewReader(text))
-	for scanner.Scan() {
-		line := scanner.Text()
+	for line := range bytes.Lines(text) {
+		line = bytes.TrimRight(line, "\r\n")
 		if todo, ok := parseLine(line); ok {
-			todo.Line = line
+			todo.Line = string(line)
 			todo.Location = Location{
 				File: file,
 				Line: row + 1,

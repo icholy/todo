@@ -11,14 +11,14 @@ import (
 
 // parseLine parses a single TODO line.
 // Does not set the Location or Line fields.
-func parseLine(line string) (Todo, bool) {
+func parseLine(line []byte) (Todo, bool) {
 	var t Todo
 	// ignore everything up to the first TODO
-	_, line, ok := strings.Cut(line, "TODO")
+	_, line, ok := bytes.Cut(line, []byte("TODO"))
 	if !ok {
 		return t, false
 	}
-	br := bufio.NewReader(strings.NewReader(line))
+	br := bufio.NewReader(bytes.NewReader(line))
 	// After "TODO", optional attributes in parentheses
 	if err := skipWhite(br); err != nil && !errors.Is(err, io.EOF) {
 		return t, false
