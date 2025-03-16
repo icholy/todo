@@ -84,7 +84,7 @@ todo ./**/*.go
 ./todo.go:88 TODO: investigate compilation error
 ```
 
-## Custom Languages
+## Language Support
 
 The library supports the following languages out of the box:
 
