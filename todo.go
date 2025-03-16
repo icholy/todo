@@ -7,13 +7,17 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	treesitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-var languages = map[string]*LanguageOptions{}
+var (
+	languagesMu sync.Mutex
+	languages   = map[string]*LanguageOptions{}
+)
 
-// LanguageOptions are options for a language.
+// LanguageOptions are treesitter options for a language.
 type LanguageOptions struct {
 	Name       string
 	Extensions []string
@@ -24,6 +28,8 @@ type LanguageOptions struct {
 // RegisterLanguage registers a language with the given extensions.
 // If no queries are provided, the default queries will be used.
 func RegisterLanguage(opt LanguageOptions) {
+	languagesMu.Lock()
+	defer languagesMu.Unlock()
 	if len(opt.Queries) == 0 {
 		names := []string{"comment", "line_comment", "block_comment"}
 		for _, name := range names {
@@ -46,6 +52,8 @@ func RegisterLanguage(opt LanguageOptions) {
 
 // LanguageFor returns the language for the given file name.
 func LanguageFor(file string) (*LanguageOptions, bool) {
+	languagesMu.Lock()
+	defer languagesMu.Unlock()
 	l, ok := languages[filepath.Ext(file)]
 	return l, ok
 }
