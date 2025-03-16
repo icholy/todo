@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	sitter "github.com/smacker/go-tree-sitter"
+	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
 func TestParse(t *testing.T) {

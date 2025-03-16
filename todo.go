@@ -8,78 +8,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/smacker/go-tree-sitter/bash"
-	"github.com/smacker/go-tree-sitter/c"
-	"github.com/smacker/go-tree-sitter/cpp"
-	"github.com/smacker/go-tree-sitter/csharp"
-	"github.com/smacker/go-tree-sitter/css"
-	"github.com/smacker/go-tree-sitter/dockerfile"
-	"github.com/smacker/go-tree-sitter/elixir"
-	"github.com/smacker/go-tree-sitter/elm"
-	"github.com/smacker/go-tree-sitter/golang"
-	"github.com/smacker/go-tree-sitter/hcl"
-	"github.com/smacker/go-tree-sitter/html"
-	"github.com/smacker/go-tree-sitter/java"
-	"github.com/smacker/go-tree-sitter/javascript"
-	"github.com/smacker/go-tree-sitter/kotlin"
-	"github.com/smacker/go-tree-sitter/lua"
-	"github.com/smacker/go-tree-sitter/ocaml"
-	"github.com/smacker/go-tree-sitter/php"
-	"github.com/smacker/go-tree-sitter/protobuf"
-	"github.com/smacker/go-tree-sitter/python"
-	"github.com/smacker/go-tree-sitter/ruby"
-	"github.com/smacker/go-tree-sitter/rust"
-	"github.com/smacker/go-tree-sitter/scala"
-	"github.com/smacker/go-tree-sitter/sql"
-	"github.com/smacker/go-tree-sitter/svelte"
-	"github.com/smacker/go-tree-sitter/swift"
-	"github.com/smacker/go-tree-sitter/toml"
-	"github.com/smacker/go-tree-sitter/typescript/tsx"
-	"github.com/smacker/go-tree-sitter/typescript/typescript"
-	"github.com/smacker/go-tree-sitter/yaml"
+	sitter "github.com/tree-sitter/go-tree-sitter"
 )
 
-var languages = map[string]*sitter.Language{
-	".go":         golang.GetLanguage(),
-	".ts":         typescript.GetLanguage(),
-	".tsx":        tsx.GetLanguage(),
-	".js":         javascript.GetLanguage(),
-	".rb":         ruby.GetLanguage(),
-	".py":         python.GetLanguage(),
-	".rs":         rust.GetLanguage(),
-	".html":       html.GetLanguage(),
-	".css":        css.GetLanguage(),
-	".sh":         bash.GetLanguage(),
-	".bash":       bash.GetLanguage(),
-	".c":          c.GetLanguage(),
-	".h":          c.GetLanguage(),
-	".cpp":        cpp.GetLanguage(),
-	".cc":         cpp.GetLanguage(),
-	".hpp":        cpp.GetLanguage(),
-	".cs":         csharp.GetLanguage(),
-	".dockerfile": dockerfile.GetLanguage(),
-	".ex":         elixir.GetLanguage(),
-	".exs":        elixir.GetLanguage(),
-	".elm":        elm.GetLanguage(),
-	".tf":         hcl.GetLanguage(),
-	".hcl":        hcl.GetLanguage(),
-	".java":       java.GetLanguage(),
-	".kt":         kotlin.GetLanguage(),
-	".kts":        kotlin.GetLanguage(),
-	".ml":         ocaml.GetLanguage(),
-	".mli":        ocaml.GetLanguage(),
-	".php":        php.GetLanguage(),
-	".proto":      protobuf.GetLanguage(),
-	".scala":      scala.GetLanguage(),
-	".sc":         scala.GetLanguage(),
-	".sql":        sql.GetLanguage(),
-	".svelte":     svelte.GetLanguage(),
-	".swift":      swift.GetLanguage(),
-	".toml":       toml.GetLanguage(),
-	".yaml":       yaml.GetLanguage(),
-	".yml":        yaml.GetLanguage(),
-	".lua":        lua.GetLanguage(),
+var languages = map[string]*sitter.Language{}
+
+// RegisterLanguage registers a language with the given extension.
+func RegisterLanguage(extension string, lang *sitter.Language) {
+	languages[extension] = lang
 }
 
 // LanguageFor returns the language for the given file name.
@@ -176,35 +112,30 @@ func ParseCode(ctx context.Context, file string, source []byte, lang *sitter.Lan
 	parser := sitter.NewParser()
 	defer parser.Close()
 	parser.SetLanguage(lang)
-	tree, err := parser.ParseCtx(ctx, nil, source)
-	if err != nil {
-		return nil, err
-	}
+	tree := parser.Parse(source, nil)
 	defer tree.Close()
-	query, err := sitter.NewQuery([]byte(`
+	query, err := sitter.NewQuery(lang, `
 		(comment) @comment
 		(#match? @comment "TODO")
-	`), lang)
+	`)
 	if err != nil {
 		return nil, err
 	}
 	defer query.Close()
 	cursor := sitter.NewQueryCursor()
 	defer cursor.Close()
-	cursor.Exec(query, tree.RootNode())
+	captures := cursor.Captures(query, tree.RootNode(), source)
 	for {
-		m, ok := cursor.NextMatch()
-		if !ok {
+		m, index := captures.Next()
+		if m == nil {
 			break
 		}
-		m = cursor.FilterPredicates(m, source)
-		for _, c := range m.Captures {
-			row := c.Node.StartPoint().Row
-			comment := source[c.Node.StartByte():c.Node.EndByte()]
-			for _, todo := range ParseText(file, comment) {
-				todo.Location.Line += int(row)
-				todos = append(todos, todo)
-			}
+		node := m.Captures[index].Node
+		row := node.StartPosition().Row
+		comment := source[node.StartByte():node.EndByte()]
+		for _, todo := range ParseText(file, comment) {
+			todo.Location.Line += int(row)
+			todos = append(todos, todo)
 		}
 	}
 	return todos, nil
