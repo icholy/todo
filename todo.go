@@ -13,9 +13,11 @@ import (
 
 var languages = map[string]*sitter.Language{}
 
-// RegisterLanguage registers a language with the given extension.
-func RegisterLanguage(extension string, lang *sitter.Language) {
-	languages[extension] = lang
+// RegisterLanguage registers a language with the given extensions.
+func RegisterLanguage(lang *sitter.Language, extensions ...string) {
+	for _, ext := range extensions {
+		languages[ext] = lang
+	}
 }
 
 // LanguageFor returns the language for the given file name.
