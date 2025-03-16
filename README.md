@@ -83,3 +83,42 @@ go install github.com/icholy/todo/cmd/todo@latest
 todo ./**/*.go
 ./todo.go:88 TODO: investigate compilation error
 ```
+
+## Custom Languages
+
+The library supports the following languages out of the box:
+
+- Golang (.go)
+- TypeScript (.ts, .tsx)
+- JavaScript (.js)
+- Ruby (.rb)
+- Rust (.rs)
+- Python (.py)
+- HTML (.html)
+- CSS (.css)
+- Bash (.sh, .bash)
+- C (.c, .h)
+- C++ (.cpp, .cc, .hpp)
+- C# (.cs)
+- Java (.java)
+- OCaml (.ml, .mli)
+- PHP (.php)
+- Scala (.scala, .sc)
+
+You can also register custom languages:
+
+```go
+import (
+    "github.com/icholy/todo"
+    treesitter "github.com/tree-sitter/go-tree-sitter"
+    lua "github.com/tjdevries/tree-sitter-lua/bindings/go"
+)
+
+func init() {
+    todo.RegisterLanguage(todo.LanguageOptions{
+        Name:       "Lua",
+        Language:   treesitter.NewLanguage(lua.Language()),
+        Extensions: []string{".lua"},
+    })
+}
+```
