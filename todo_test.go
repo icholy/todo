@@ -325,8 +325,9 @@ func BenchmarkParseCode(b *testing.B) {
 	if err != nil {
 		b.Fatalf("failed to read source: %v", err)
 	}
+	ctx := context.Background()
 	for b.Loop() {
-		todos, err := ParseCode(context.Background(), "testdata/sample.go", source, nil)
+		todos, err := ParseCode(ctx, "testdata/sample.go", source, nil)
 		if err != nil {
 			b.Fatalf("failed to parse: %v", err)
 		}
