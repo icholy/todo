@@ -319,6 +319,20 @@ func TestLocationString(t *testing.T) {
 	}
 }
 
+func FuzzParseLine(f *testing.F) {
+	f.Add([]byte("TODO: fix this"))
+	f.Add([]byte("TODO(created=2025-03-09,assigned=john): fix this"))
+	f.Add([]byte(`TODO(message="fix this, that"): implement feature`))
+	f.Add([]byte("// TODO(): fix this"))
+	f.Add([]byte("not a todo"))
+	f.Add([]byte(`TODO(path="C:\\Program Files\\App"): update path`))
+	f.Add([]byte(`TODO(message="value with \"escaped\" quotes"): task`))
+	f.Add([]byte(`   TODO (key = value, key2 =  "value" ) : description`))
+	f.Fuzz(func(t *testing.T, line []byte) {
+		parseLine(line)
+	})
+}
+
 func BenchmarkParseCode(b *testing.B) {
 	source, err := os.ReadFile("testdata/sample.go")
 	if err != nil {
